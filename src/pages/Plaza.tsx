@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -69,6 +70,7 @@ function isExpiringSoon(dateStr: string) {
 }
 
 export default function Plaza() {
+  const navigate = useNavigate();
   const { tools, toggleToolFavorite, addToolApplication } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<ToolCategory | 'all'>('all');
@@ -98,6 +100,9 @@ export default function Plaza() {
       reason: applyForm.reason,
       applicant: '当前用户',
       status: 'pending',
+      category: 'other',
+      suitableRoles: [],
+      icon: 'FileText',
     });
     setApplyForm({ toolName: '', description: '', reason: '' });
     setShowApplyModal(false);
@@ -264,7 +269,10 @@ export default function Plaza() {
                     >
                       到期：{tool.expiresAt}
                     </span>
-                    <button className="px-4 py-1.5 text-xs font-body font-medium rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-surface hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg shadow-amber-500/20">
+                    <button
+                      onClick={() => navigate(`/workspace?toolId=${tool.id}`)}
+                      className="px-4 py-1.5 text-xs font-body font-medium rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-surface hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg shadow-amber-500/20"
+                    >
                       使用
                     </button>
                   </div>

@@ -109,14 +109,14 @@ export default function Team() {
     prompts,
     toolApplications,
     optimizationSuggestions,
-    toggleToolFavorite,
+    setTeamRecommended,
     approveApplication,
     rejectApplication,
     dismissSuggestion,
   } = useStore()
 
-  const favoritedTools = tools.filter((t) => t.isFavorited)
-  const nonFavoritedTools = tools.filter((t) => !t.isFavorited)
+  const recommendedTools = tools.filter((t) => t.teamRecommended)
+  const nonRecommendedTools = tools.filter((t) => !t.teamRecommended)
 
   const roleTools = tools.filter((t) =>
     t.suitableRoles.some((r) => roleConfig[activeRole]?.roles.includes(r))
@@ -179,7 +179,7 @@ export default function Team() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-slate-400">
-                  共 {favoritedTools.length} 个推荐工具
+                  共 {recommendedTools.length} 个推荐工具
                 </p>
                 <div className="relative">
                   <button
@@ -196,18 +196,18 @@ export default function Team() {
                     />
                   </button>
                   <AnimatePresence>
-                    {addRecommendOpen && nonFavoritedTools.length > 0 && (
+                    {addRecommendOpen && nonRecommendedTools.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         className="absolute right-0 mt-2 w-64 glass rounded-xl py-2 z-30 max-h-72 overflow-y-auto"
                       >
-                        {nonFavoritedTools.map((tool) => (
+                        {nonRecommendedTools.map((tool) => (
                           <button
                             key={tool.id}
                             onClick={() => {
-                              toggleToolFavorite(tool.id)
+                              setTeamRecommended(tool.id, true)
                             }}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-indigo-500/10 transition-colors"
                           >
@@ -228,7 +228,7 @@ export default function Team() {
                 </div>
               </div>
 
-              {favoritedTools.length === 0 ? (
+              {recommendedTools.length === 0 ? (
                 <div className="glass rounded-2xl p-12 text-center">
                   <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-400">暂无推荐工具</p>
@@ -238,7 +238,7 @@ export default function Team() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {favoritedTools.map((tool, i) => {
+                  {recommendedTools.map((tool, i) => {
                     const Icon = iconMap[tool.icon] || FileText
                     return (
                       <motion.div
@@ -268,7 +268,7 @@ export default function Team() {
                           {categoryLabels[tool.category]}
                         </span>
                         <button
-                          onClick={() => toggleToolFavorite(tool.id)}
+                          onClick={() => setTeamRecommended(tool.id, false)}
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
                         >
                           <X className="w-3 h-3" />
@@ -323,6 +323,14 @@ export default function Team() {
                             >
                               {statusConfig[app.status].label}
                             </span>
+                            <span
+                              className={cn(
+                                'text-xs px-2.5 py-0.5 rounded-full',
+                                categoryColors[app.category]
+                              )}
+                            >
+                              {categoryLabels[app.category]}
+                            </span>
                           </div>
                           <p className="text-sm text-slate-300 mb-1">
                             {app.description}
@@ -330,6 +338,16 @@ export default function Team() {
                           <p className="text-xs text-slate-500 mb-2">
                             申请理由：{app.reason}
                           </p>
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {app.suitableRoles.map((role) => (
+                              <span
+                                key={role}
+                                className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300"
+                              >
+                                {role}
+                              </span>
+                            ))}
+                          </div>
                           <div className="flex items-center gap-1.5 text-xs text-slate-600">
                             <Clock className="w-3 h-3" />
                             {formatDate(app.createdAt)}

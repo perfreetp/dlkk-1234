@@ -47,6 +47,7 @@ interface StoreState {
 
 interface StoreActions {
   toggleToolFavorite: (toolId: string) => void;
+  setTeamRecommended: (toolId: string, recommended: boolean) => void;
   addToolApplication: (application: Omit<ToolApplication, 'id' | 'createdAt'>) => void;
   approveApplication: (applicationId: string) => void;
   rejectApplication: (applicationId: string) => void;
@@ -82,6 +83,13 @@ const useStore = create<Store>()(
           ),
         })),
 
+      setTeamRecommended: (toolId, recommended) =>
+        set((state) => ({
+          tools: state.tools.map((tool) =>
+            tool.id === toolId ? { ...tool, teamRecommended: recommended } : tool
+          ),
+        })),
+
       addToolApplication: (application) =>
         set((state) => ({
           toolApplications: [
@@ -95,11 +103,34 @@ const useStore = create<Store>()(
         })),
 
       approveApplication: (applicationId) =>
-        set((state) => ({
-          toolApplications: state.toolApplications.map((app) =>
-            app.id === applicationId ? { ...app, status: 'approved' as const } : app
-          ),
-        })),
+        set((state) => {
+          const app = state.toolApplications.find((a) => a.id === applicationId);
+          const newTools = app
+            ? [
+                ...state.tools,
+                {
+                  id: `tool-${Date.now()}`,
+                  name: app.toolName,
+                  description: app.description,
+                  category: app.category,
+                  icon: app.icon,
+                  quota: { used: 0, total: 100 },
+                  expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+                    .toISOString()
+                    .split('T')[0],
+                  isFavorited: false,
+                  teamRecommended: false,
+                  suitableRoles: app.suitableRoles,
+                },
+              ]
+            : state.tools;
+          return {
+            tools: newTools,
+            toolApplications: state.toolApplications.map((app) =>
+              app.id === applicationId ? { ...app, status: 'approved' as const } : app
+            ),
+          };
+        }),
 
       rejectApplication: (applicationId) =>
         set((state) => ({

@@ -14,6 +14,7 @@ export interface Tool {
   quota: ToolQuota;
   expiresAt: string;
   isFavorited: boolean;
+  teamRecommended: boolean;
   suitableRoles: string[];
 }
 
@@ -34,6 +35,8 @@ export interface WorkflowStep {
   toolId: string;
   order: number;
   config: Record<string, string>;
+  inputTemplate?: string;
+  promptVariables?: string[];
 }
 
 export interface Workflow {
@@ -53,6 +56,9 @@ export interface TaskRecord {
   isFavorited: boolean;
   createdAt: string;
   workflowId?: string;
+  workflowName?: string;
+  stepIndex?: number;
+  workflowStepId?: string;
 }
 
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
@@ -65,6 +71,9 @@ export interface ToolApplication {
   applicant: string;
   status: ApplicationStatus;
   createdAt: string;
+  category: ToolCategory;
+  suitableRoles: string[];
+  icon: string;
 }
 
 export type SuggestionType = 'duplicate' | 'inefficient' | 'outdated';
@@ -89,6 +98,7 @@ export const mockTools: Tool[] = [
     quota: { used: 45, total: 100 },
     expiresAt: '2026-12-31',
     isFavorited: true,
+    teamRecommended: true,
     suitableRoles: ['内容运营', '市场专员'],
   },
   {
@@ -100,6 +110,7 @@ export const mockTools: Tool[] = [
     quota: { used: 20, total: 50 },
     expiresAt: '2026-09-30',
     isFavorited: false,
+    teamRecommended: false,
     suitableRoles: ['内容运营', 'SEO专员'],
   },
   {
@@ -111,6 +122,7 @@ export const mockTools: Tool[] = [
     quota: { used: 30, total: 80 },
     expiresAt: '2026-11-15',
     isFavorited: true,
+    teamRecommended: true,
     suitableRoles: ['内容运营', '编辑'],
   },
   {
@@ -122,6 +134,7 @@ export const mockTools: Tool[] = [
     quota: { used: 15, total: 40 },
     expiresAt: '2026-10-31',
     isFavorited: false,
+    teamRecommended: true,
     suitableRoles: ['设计师', '内容运营'],
   },
   {
@@ -133,6 +146,7 @@ export const mockTools: Tool[] = [
     quota: { used: 8, total: 30 },
     expiresAt: '2026-08-20',
     isFavorited: false,
+    teamRecommended: false,
     suitableRoles: ['设计师'],
   },
   {
@@ -144,6 +158,7 @@ export const mockTools: Tool[] = [
     quota: { used: 5, total: 25 },
     expiresAt: '2026-12-01',
     isFavorited: true,
+    teamRecommended: false,
     suitableRoles: ['设计师', '产品经理'],
   },
   {
@@ -155,6 +170,7 @@ export const mockTools: Tool[] = [
     quota: { used: 60, total: 120 },
     expiresAt: '2026-12-31',
     isFavorited: true,
+    teamRecommended: true,
     suitableRoles: ['翻译', '内容运营'],
   },
   {
@@ -166,6 +182,7 @@ export const mockTools: Tool[] = [
     quota: { used: 25, total: 60 },
     expiresAt: '2026-11-30',
     isFavorited: false,
+    teamRecommended: true,
     suitableRoles: ['翻译', '编辑'],
   },
   {
@@ -177,6 +194,7 @@ export const mockTools: Tool[] = [
     quota: { used: 10, total: 30 },
     expiresAt: '2026-10-15',
     isFavorited: false,
+    teamRecommended: false,
     suitableRoles: ['翻译', '内容运营'],
   },
   {
@@ -188,6 +206,7 @@ export const mockTools: Tool[] = [
     quota: { used: 35, total: 70 },
     expiresAt: '2026-12-31',
     isFavorited: false,
+    teamRecommended: true,
     suitableRoles: ['研究员', '内容运营'],
   },
   {
@@ -199,6 +218,7 @@ export const mockTools: Tool[] = [
     quota: { used: 40, total: 80 },
     expiresAt: '2026-11-20',
     isFavorited: true,
+    teamRecommended: false,
     suitableRoles: ['研究员', '编辑'],
   },
   {
@@ -210,6 +230,7 @@ export const mockTools: Tool[] = [
     quota: { used: 12, total: 50 },
     expiresAt: '2026-09-30',
     isFavorited: false,
+    teamRecommended: false,
     suitableRoles: ['数据分析师', '研究员'],
   },
   {
@@ -221,6 +242,7 @@ export const mockTools: Tool[] = [
     quota: { used: 18, total: 60 },
     expiresAt: '2026-12-31',
     isFavorited: false,
+    teamRecommended: false,
     suitableRoles: ['编辑', '内容运营'],
   },
 ];
@@ -473,6 +495,9 @@ export const mockToolApplications: ToolApplication[] = [
     applicant: '张明',
     status: 'pending',
     createdAt: '2026-06-01T09:00:00Z',
+    category: 'writing',
+    suitableRoles: ['内容运营', '市场专员'],
+    icon: 'PenLine',
   },
   {
     id: 'app-2',
@@ -482,6 +507,9 @@ export const mockToolApplications: ToolApplication[] = [
     applicant: '李婷',
     status: 'approved',
     createdAt: '2026-05-15T10:00:00Z',
+    category: 'writing',
+    suitableRoles: ['市场专员', '编辑'],
+    icon: 'FileText',
   },
   {
     id: 'app-3',
@@ -491,6 +519,9 @@ export const mockToolApplications: ToolApplication[] = [
     applicant: '王磊',
     status: 'rejected',
     createdAt: '2026-05-20T14:00:00Z',
+    category: 'research',
+    suitableRoles: ['研究员', '编辑'],
+    icon: 'FileText',
   },
 ];
 
